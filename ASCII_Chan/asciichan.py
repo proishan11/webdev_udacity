@@ -25,10 +25,12 @@ class Art(db.Model):
 	created = db.DateTimeProperty(auto_now_add=True)
 
 class MainPage(Handler):
-	def render_front(self, title="", art="", error=""):
+	def render_front(self, title="", art="", error="", password=""):
 		arts = db.GqlQuery("select * from Art order by created desc")
 
-		self.render("front.html", title=title, art=art, error=error, arts=arts)
+
+
+		self.render("front.html", title=title, art=art, error=error, arts=arts, password=password)
 
 	def get(self):
 		self.render_front()
@@ -36,14 +38,14 @@ class MainPage(Handler):
 	def post(self):
 		title = self.request.get("title")
 		art = self.request.get("art")
+		password = self.request.get("password")
 
-		if title and art:
+		if title and art and password == "akalight":
 			a = Art(title=title, art=art)
 			a.put()
-
 			self.redirect("/")
 		else:
-			error = "we need both a title and some artwork!"
+			error = "Request not accepted"
 			self.render_front(title,art, error)
 
 app = webapp2.WSGIApplication([('/', MainPage)], debug=True)
